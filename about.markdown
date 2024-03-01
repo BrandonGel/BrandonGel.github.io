@@ -4,15 +4,13 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+Hello, my name is Brandon Ho.
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+I am a Robotics Ph.D. student from Georgia Institute of Technology at Atlanta, Georgia. I obtained  bachelor degree in mechanical engineering with a double minors in computer science and mathematics from the Cooper Union and a master degree in mechanical engineering with a minor in machine learning from Georiga Tech.
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+My research interests are developing high-level control and planning algorithms, using deep learning, for motion planning and navigation.
+
+During my free time, I participate in ballroom dancing, cycling, unicycling, juggling, and cooking.
 
 
-[jekyll-organization]: https://github.com/jekyll
+
