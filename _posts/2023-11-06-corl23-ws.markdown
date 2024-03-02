@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "CoRL23 Agile Robotics Workshop: Towards Learning Scalable Agile Dynamic Motion Planning for Robosoccer Teams with Policy Optimization"
+date:   <2023-11-06>
+categories: blog
+---
+
+[Link to Paper][Link-to-Paper]
+
+<!-- ![image info](..\..\..\..\assets\images\research\corl23_cover.png){:class="img-responsive",height="1400px" width="800px"} -->
+
+![image info](..\..\..\..\assets\images\research\corl23_sample.gif){:class="img-responsive",height="1400px" width="800px"}
+
+In fast-paced, ever-changing environments, dynamic Motion Planning for Multi-Agent Systems in the presence of obstacles is a universal and unsolved problem. Be it from path planning around obstacles to the movement of robotic arms, or in planning navigation of robot teams in settings such as Robosoccer, dynamic motion planning is needed to avoid collisions while reaching the targeted destination when multiple agents occupy the same area. In continuous domains where the world changes quickly, existing classical Motion Planning algorithms such as RRT* and A* become computationally expensive to rerun at every time step. Many variations of classical and well-formulated non-learning path-planning methods have been proposed to solve this universal problem but fall short due to their limitations of speed, smoothness, optimally, etc. Deep Learning models overcome their challenges due to their ability to adapt to varying environments based on past experience. However, current learning motion planning models use discretized environments, do not account for heterogeneous agents or replanning, and build up to improve the classical motion planners’ efficiency, leading to issues with scalability. To prevent collisions between heterogenous team members and collision to obstacles while trying to reach the target location, we present a learning-based dynamic navigation model and show our model working on a simple environment in the concept of a simple Robosoccer Game.
+
+
+[Link-to-Paper]: <https://openreview.net/forum?id=VQgFQn27vU>
