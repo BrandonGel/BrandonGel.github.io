@@ -2,7 +2,7 @@
 layout: post
 title:  "The Astrophysical Journal: Characteristics of Nanoflare Heating in a Coronal Bright Point"
 date:   <2022-09-07>
-categories: blog
+categories: research
 featured_img: \assets\images\research\nanoflare_cover.png
 ---
 

@@ -2,7 +2,7 @@
 layout: post
 title:  "CoRL23 Agile Robotics Workshop: Towards Learning Scalable Agile Dynamic Motion Planning for Robosoccer Teams with Policy Optimization"
 date:   <2023-11-06>
-categories: blog
+categories: research
 ---
 
 [Link to Paper][Link-to-Paper]
