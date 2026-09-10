@@ -1,88 +1,44 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-#
-# If you need help with YAML syntax, here are some quick references for you:
-# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
-# https://learnxinyminutes.com/docs/yaml/
-#
 # Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-
 title: Brandon Ho
+author: Brandon Ho
 email: ho.brandon.g@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Hello, I am a Robotics Ph.D. student from Georgia Institute of Technology at Atlanta, Georgia.
-  I obtained a bachelor degree in mechanical engineering and a double minors
-  in computer science and mathematics from the Cooper Union and a master degree
-  in mechanical engineering from Georiga Tech.
-  My research interests are developing 
-  high-level control and planning algorithms, using deep learning, for motion planning
-  and navigation.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://brandongel.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: BrandongelHo
-github_username:  BrandonGel
+copyright: © 2026 Brandon Ho
+lang: en
 
+# Short tagline used in the <title> tag. Keep this under ~60 characters.
+tagline: Robotics Ph.D. Student at Georgia Tech
+
+# Longer blurb shown beside the avatar on the homepage, and used as the
+# meta description for search results and link previews.
+description: >-
+  Robotics Ph.D. student at the Georgia Institute of Technology in Atlanta,
+  Georgia. I develop high-level control and planning algorithms, using deep
+  learning, for motion planning and navigation.
+
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://brandongel.github.io" # no trailing slash
+
+twitter_username: BrandongelHo
+github_username: BrandonGel
+
+show_excerpts: false # set to true to show post excerpts on the homepage
 
 lin:
   date_format: "%b %-d, %Y"
-
-  # path to the author avatar image
-  avatar_path: assets/images/avatar.png
-
-  # generate social links
+  avatar_path: /assets/images/avatar.png
   social_links:
     twitter: BrandongelHo
-    github:  BrandonGel
-    # medium:  jekyll
-    # rss: rss
-    # dribbble: jekyll
-    # facebook: jekyll
-    # flickr:   jekyll
-    # instagram: jekyll
+    github: BrandonGel
     linkedin: BrandonHo2000
-    # pinterest: jekyll
-    # youtube_user: jekyll
-    # youtube_channel: UC8CXR0-3I70i1tfPg1PAE1g
-    # telegram: jekyll
-    # googleplus: +jekyll
-    # keybase: jekyll
 
+# The theme's home and post layouts read the date format from `minima`,
+# not from `lin`. Keep both in sync.
+minima:
+  date_format: "%b %-d, %Y"
 
 # Build settings
-# theme: minima
-# remote_theme: "mmistakes/jekyll-theme-basically-basic"
 remote_theme: "ssokurenko/jekyll-lin-theme"
-# theme: jekyll-lin
+
 plugins:
   - jekyll-feed
-
-# Exclude from processing.
-# The following items will not be processed, by default.
-# Any item listed under the `exclude:` key here will be automatically added to
-# the internal "default list".
-#
-# Excluded items can be processed by explicitly listing the directories or
-# their entries' file path in the `include:` list.
-#
-# exclude:
-#   - .sass-cache/
-#   - .jekyll-cache/
-#   - gemfiles/
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules/
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+  - jekyll-seo-tag

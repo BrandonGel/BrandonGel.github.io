@@ -6,11 +6,8 @@ permalink: /about/
 
 Hello, my name is Brandon Ho.
 
-I am a Robotics Ph.D. student from Georgia Institute of Technology at Atlanta, Georgia. I obtained  bachelor degree in mechanical engineering with a double minors in computer science and mathematics from the Cooper Union and a master degree in mechanical engineering with a minor in machine learning from Georiga Tech.
+I am a Robotics Ph.D. student at the Georgia Institute of Technology in Atlanta, Georgia. I earned a B.E. in mechanical engineering with a double minor in computer science and mathematics from The Cooper Union, and an M.S. in mechanical engineering with a minor in machine learning from Georgia Tech.
 
 My research interests are developing high-level control and planning algorithms, using deep learning, for motion planning and navigation.
 
-During my free time, I participate in ballroom dancing, cycling, unicycling, juggling, and cooking.
-
-
-
+In my free time I do ballroom dancing, cycling, unicycling, juggling, and cooking.
