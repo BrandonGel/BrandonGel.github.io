@@ -24,20 +24,12 @@ github_username: BrandonGel
 show_excerpts: false # set to true to show post excerpts on the homepage
 
 lin:
-  date_format: "%b %-d, %Y"
   avatar_path: /assets/images/avatar.png
   social_links:
-    twitter: BrandongelHo
-    github: BrandonGel
     linkedin: BrandonHo2000
 
-# The theme's home and post layouts read the date format from `minima`,
-# not from `lin`. Keep both in sync.
-minima:
-  date_format: "%b %-d, %Y"
-
 # Build settings
-remote_theme: "ssokurenko/jekyll-lin-theme"
+# No theme: layouts and styles live in this repo under _layouts/ and assets/css/.
 
 plugins:
   - jekyll-feed

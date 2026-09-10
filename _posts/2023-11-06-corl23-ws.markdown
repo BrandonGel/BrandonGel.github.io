@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  "CoRL23 Agile Robotics Workshop: Towards Learning Scalable Agile Dynamic Motion Planning for Robosoccer Teams with Policy Optimization"
+title:  "Towards Learning Scalable Agile Dynamic Motion Planning for Robosoccer Teams with Policy Optimization"
 date:   2023-11-06
 categories: research
+venue: "CoRL 2023 Agile Robotics Workshop"
 image: /assets/images/research/corl23_cover.png
 description: >-
   A learning-based dynamic navigation model for heterogeneous multi-agent teams,

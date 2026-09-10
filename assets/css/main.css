@@ -1,0 +1,399 @@
+/* ---------------------------------------------------------------
+   Brandon Ho — personal site
+   Self-contained. No external CSS framework.
+--------------------------------------------------------------- */
+
+:root {
+  --paper:      #FAFBFC;
+  --card:       #FFFFFF;
+  --ink:        #14181F;
+  --ink-soft:   #525E6D;
+  --ink-faint:  #7C8899;
+  --line:       #DFE5EC;
+  --accent:     #0B5FA5;
+  --accent-ink: #08497E;
+  --accent-wash:#EAF1F8;
+
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+
+  --measure: 34rem;
+  --gutter: 5.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:      #10141A;
+    --card:       #161C24;
+    --ink:        #E8ECF1;
+    --ink-soft:   #A2AEBD;
+    --ink-faint:  #778399;
+    --line:       #262F3B;
+    --accent:     #6BB2F0;
+    --accent-ink: #9BCCF7;
+    --accent-wash:#182430;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.site-name {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+}
+
+.site-nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  padding: 3.5rem 0 2.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.hero-portrait {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--line);
+}
+
+.hero h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 2.25rem;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.5rem;
+}
+
+.hero-role {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--accent);
+  margin: 0 0 1rem;
+}
+
+.hero-bio {
+  margin: 0;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+/* The trajectory motif: a planned path routing around obstacles. */
+.trajectory {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 2.5rem;
+  overflow: visible;
+}
+
+.trajectory .obstacle {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.trajectory .path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+  stroke-linecap: round;
+}
+
+.trajectory .waypoint { fill: var(--accent); }
+.trajectory .goal { fill: none; stroke: var(--accent); stroke-width: 2; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .trajectory .path {
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    animation: plan 1.6s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .trajectory .waypoint,
+  .trajectory .goal { opacity: 0; animation: settle .4s ease forwards 1.3s; }
+}
+
+@keyframes plan {
+  to { stroke-dashoffset: 0; stroke-dasharray: 5 6; }
+}
+@keyframes settle {
+  to { opacity: 1; }
+}
+
+/* ---------- Entry list (publications) ---------- */
+
+.section { padding: 3rem 0; }
+
+.section-title {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink-faint);
+  margin: 0 0 2rem;
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: var(--gutter) 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.entry:last-child { border-bottom: 1px solid var(--line); }
+
+.entry-year {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.1rem;
+}
+
+.entry-title {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem;
+}
+
+.entry-title a {
+  color: var(--ink);
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size .25s ease;
+}
+
+.entry-title a:hover { background-size: 100% 1px; color: var(--accent); }
+
+.entry-venue {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ---------- Prose pages ---------- */
+
+.page { padding: 3rem 0 4rem; }
+
+.page h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 0 0 2rem;
+}
+
+.prose { max-width: var(--measure); }
+
+.prose > * + * { margin-top: 1.15rem; }
+
+.prose h2 {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 2.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose h3 {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+}
+
+.prose a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.prose a:hover { color: var(--accent-ink); }
+
+.prose ul { padding-left: 1.1rem; margin-top: 0.75rem; }
+.prose li { margin-top: 0.4rem; }
+.prose li > ul { margin-top: 0.35rem; }
+.prose li::marker { color: var(--ink-faint); }
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+}
+
+.prose code {
+  font-size: 0.9em;
+  background: var(--accent-wash);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+/* CV: tighten the nested bullet pattern into something scannable */
+.prose ul ul { color: var(--ink-soft); font-size: 0.9375rem; }
+
+/* ---------- Post ---------- */
+
+.post-header { margin-bottom: 2.5rem; }
+
+.post-venue {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.post-date {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--ink-faint);
+  margin: 0.75rem 0 0;
+}
+
+.post-header h1 { margin-bottom: 0; }
+
+/* ---------- Contact ---------- */
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.contact-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 0.5rem 0;
+}
+
+.contact-list a:hover { color: var(--accent); }
+.contact-list svg { width: 18px; height: 18px; flex: none; color: var(--ink-faint); }
+.contact-list a:hover svg { color: var(--accent); }
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+  padding: 2rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+}
+
+.site-footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.social { display: flex; gap: 1rem; }
+.social a { color: var(--ink-faint); display: inline-flex; }
+.social a:hover { color: var(--accent); }
+.social svg { width: 18px; height: 18px; }
+
+/* ---------- Accessibility ---------- */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 34rem) {
+  .hero { padding: 2.5rem 0 2rem; }
+  .hero-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+  .hero-portrait { width: 5.5rem; height: 5.5rem; }
+  .hero h1 { font-size: 1.875rem; }
+  .entry { grid-template-columns: 1fr; gap: 0.4rem; }
+  .entry-year { font-size: 0.9375rem; }
+  .site-header .wrap { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .site-nav { gap: 1.15rem; }
+}

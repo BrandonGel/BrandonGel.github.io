@@ -1,0 +1,17 @@
+---
+layout: default
+---
+<article class="page">
+  <div class="wrap">
+    <header class="post-header">
+      {%- if page.venue %}<p class="post-venue">{{ page.venue }}</p>{%- endif -%}
+      <h1>{{ page.title | escape }}</h1>
+      <p class="post-date">
+        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
+      </p>
+    </header>
+    <div class="prose">
+      {{ content }}
+    </div>
+  </div>
+</article>

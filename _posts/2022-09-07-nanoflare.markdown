@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  "The Astrophysical Journal: Characteristics of Nanoflare Heating in a Coronal Bright Point"
+title:  "Characteristics of Nanoflare Heating in a Coronal Bright Point"
 date:   2022-09-07
 categories: research
+venue: "The Astrophysical Journal"
 image: /assets/images/research/nanoflare_cover.png
 description: >-
   Constraints on the nanoflare energy distribution and timing for the heating of a
