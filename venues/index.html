@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Publishing venues for multi-robot systems, path planning, task allocation and warehouse robotics, ranked by acceptance rate, with upcoming deadlines.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Venue Floor — Multi-robot & warehouse robotics publishing guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --floor:#E6E9E8; --panel:#F6F7F6; --ink:#1C2A39; --muted:#586878;
+  --line:#C9D0D2; --steel:#3E6A8A; --safety:#F2C230; --safety-ink:#5A4300;
+  --ok:#2F7D5B; --gone:#9AA5AE;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --floor:#131B23; --panel:#1B2530; --ink:#E4EAEE; --muted:#9FB0BE;
+    --line:#2F3D4A; --steel:#7FA9C8; --safety:#F2C230; --safety-ink:#1C1500;
+    --ok:#5FC194; --gone:#5D6B77;
+  }
+}
+:root[data-theme="dark"]{
+  --floor:#131B23; --panel:#1B2530; --ink:#E4EAEE; --muted:#9FB0BE;
+  --line:#2F3D4A; --steel:#7FA9C8; --safety:#F2C230; --safety-ink:#1C1500;
+  --ok:#5FC194; --gone:#5D6B77;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--floor);color:var(--ink);
+  font:400 16px/1.5 "Barlow",system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--steel)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--safety);outline-offset:2px}
+.wrap{max-width:960px;margin:0 auto;padding:0 18px}
+
+/* hero */
+header{padding:28px 0 8px}
+.hero{display:grid;grid-template-columns:1fr;gap:18px;align-items:end}
+@media(min-width:760px){.hero{grid-template-columns:1.1fr .9fr}}
+h1{font:700 clamp(2.4rem,7vw,3.6rem)/.95 "Barlow Condensed","Arial Narrow",sans-serif;
+  margin:0 0 10px;letter-spacing:-.01em}
+.lede{margin:0;color:var(--muted);max-width:52ch}
+canvas{width:100%;height:170px;display:block;border-radius:6px;background:var(--panel);
+  border:1px solid var(--line)}
+.stamp{font-size:.85rem;color:var(--muted);margin-top:10px}
+
+/* tabs */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--floor);
+  padding:12px 0 10px;border-bottom:1px solid var(--line);margin-top:14px}
+.tabs{display:flex;gap:6px;overflow-x:auto}
+.tab{font:600 1.05rem "Barlow Condensed",sans-serif;padding:8px 14px;border-radius:4px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--safety);color:var(--safety-ink);border-color:var(--safety)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font:500 .85rem "Barlow",sans-serif;padding:4px 10px;border-radius:99px;border:1px solid var(--line);
+  background:transparent;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--floor);border-color:var(--ink)}
+
+main{padding:10px 0 40px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
+.sw{display:inline-block;width:22px;height:10px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.sw.v{background:var(--steel)}
+.sw.e{background:repeating-linear-gradient(135deg,var(--steel) 0 3px,transparent 3px 6px);border:1px solid var(--steel)}
+
+/* rows */
+ol.list{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.rank{font:700 1.4rem/1 "Barlow Condensed",sans-serif;color:var(--muted);padding-top:2px}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.name{font:700 1.3rem/1.1 "Barlow Condensed",sans-serif}
+.name a{color:inherit;text-decoration:none;border-bottom:2px solid var(--safety)}
+.full{color:var(--muted);font-size:.9rem;margin:2px 0 8px}
+.rate{font:600 1.05rem "Barlow Condensed",sans-serif;white-space:nowrap}
+.rate small{font:500 .78rem "Barlow",sans-serif;color:var(--muted);margin-left:4px}
+.bar{position:relative;height:10px;background:var(--panel);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.fill{position:absolute;top:0;bottom:0;left:0;background:var(--steel)}
+.fill.est{background:repeating-linear-gradient(135deg,var(--steel) 0 3px,transparent 3px 6px)}
+.meta{display:flex;gap:8px 14px;flex-wrap:wrap;font-size:.86rem;color:var(--muted);margin-top:8px}
+.tag{border:1px solid var(--line);border-radius:3px;padding:0 6px}
+.src{font-size:.8rem}
+.prev{position:absolute;top:-2px;bottom:-2px;width:3px;background:var(--safety);border-radius:1px}
+.trend{font-size:.86rem;color:var(--muted);margin-top:6px}
+.trend b{font-weight:600;color:var(--ink)}
+.up{color:var(--ok)}.down{color:#C0513A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .down{color:#F08A70}}
+:root[data-theme="dark"] .down{color:#F08A70}
+
+/* deadlines */
+.dl{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.days{font:700 1.8rem/1 "Barlow Condensed",sans-serif;text-align:right}
+.days span{display:block;font:500 .75rem "Barlow",sans-serif;color:var(--muted)}
+.dl.soon .days{color:var(--safety-ink);background:var(--safety);border-radius:4px;padding:6px 6px 4px}
+.dl.gone{opacity:.6}
+.dl.gone .days{color:var(--gone)}
+h2{font:700 1.5rem "Barlow Condensed",sans-serif;margin:22px 0 4px}
+.note{color:var(--muted);font-size:.9rem;max-width:70ch}
+footer{border-top:1px solid var(--line);padding:18px 0 30px;color:var(--muted);font-size:.85rem}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){canvas{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="stamp" style="margin:0 0 14px"><a href="/">Brandon Ho</a></p>
+  <div class="hero">
+    <div>
+      <h1>Venue Floor</h1>
+      <p class="lede">Where to publish multi-robot, path-planning and warehouse-robotics work, ranked by how hard each venue is to get into, with upcoming deadlines.</p>
+    </div>
+    <canvas id="floor" aria-hidden="true"></canvas>
+  </div>
+  <p class="stamp">Data snapshot: 26 September 2026. Deadline countdowns update live from today's date.</p>
+</header>
+
+<nav>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-view="conf">Conferences</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="jour">Journals</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="dead">Deadlines</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</nav>
+
+<main>
+  <section id="v-conf">
+    <div class="legend"><span><i class="sw v"></i>Published acceptance rate</span><span><i class="sw e"></i>Rough estimate (midpoint of range)</span><span><i class="sw" style="width:4px;background:var(--safety)"></i>Previous year</span></div>
+    <ol class="list" id="conf-list"></ol>
+  </section>
+
+  <section id="v-jour" hidden>
+    <p class="note">Most journals don't publish acceptance rates regularly, so every journal figure here is a rough range. Check editor reports or the publisher's journal finder for current numbers.</p>
+    <ol class="list" id="jour-list"></ol>
+  </section>
+
+  <section id="v-dead" hidden>
+    <p class="note">Sorted by the next submission date. Always confirm on the official call for papers, since deadlines get extended or moved.</p>
+    <div id="dead-list"></div>
+  </section>
+</main>
+
+<footer>
+  Acceptance rates from official statistics compiled by CS Conf Stats, AAMAS proceedings and Paper Copilot. Deadlines from official conference sites and mldeadlines.com. A lower acceptance rate doesn't always mean a more prestigious venue: RSS and CoRL draw strong, self-selected submission pools.
+</footer>
+</div>
+
+<script>
+const AREAS=["All","Robotics","Multi-robot","AI & planning","Learning","Control","ASME","Industry"];
+
+const CONF=[
+ {n:"IJCAI",f:"International Joint Conference on Artificial Intelligence",a:["AI & planning"],r:13.6,y:"2026",p:17.6,py:"2025 · 1,023 / 5,806",v:1,u:"https://www.ijcai.org/future_conferences",next:"IJCAI-ECAI 2027 · Aug 7–13, 2027, Kyoto",dl:null,dlNote:"Deadline not yet announced (usually mid-January)"},
+ {n:"AAAI",f:"AAAI Conference on Artificial Intelligence",a:["AI & planning"],r:17.6,y:"2026",p:23.4,py:"2025 · approx.",v:1,u:"https://aaai.org/conference/aaai/aaai-27/",next:"AAAI-27 · Feb 16–23, 2027, Montreal",dl:null,dlNote:"AAAI-27 submissions closed in summer 2026"},
+ {n:"AAMAS",f:"Autonomous Agents and Multiagent Systems",a:["AI & planning","Multi-robot"],r:24.9,y:"2026 · 338 / 1,359",p:24.5,py:"2025 · 250 / 1,021",v:1,u:"https://warwick.ac.uk/fac/sci/dcs/aamas2027/",next:"AAMAS 2027 · May 3–7, 2027, Hanoi",dl:"2026-10-01",dlNote:"Mandatory abstract deadline; notification Dec 21, 2026"},
+ {n:"NeurIPS",f:"Neural Information Processing Systems",a:["Learning"],r:25.7,y:"2026",p:24.5,py:"2025",v:1,u:"https://neurips.cc/",next:"NeurIPS 2026 · Dec 6–12, 2026, Sydney",dl:null,dlNote:"2027 deadline expected around May 2027"},
+ {n:"ICML",f:"International Conference on Machine Learning",a:["Learning"],r:26.6,y:"2026",p:26.9,py:"2025 · 3,260 / 12,107",v:1,u:"https://icml.cc/",next:"ICML 2027",dl:null,dlNote:"Deadline expected around late January 2027"},
+ {n:"ICLR",f:"International Conference on Learning Representations",a:["Learning"],r:27.4,y:"2026",p:31.7,py:"2025 · 3,703 / 11,663",v:1,u:"https://iclr.cc/Conferences/2027",next:"ICLR 2027 · Apr 26–30, 2027, California",dl:null,dlNote:"ICLR 2027 submissions closed Sep 25, 2026"},
+ {n:"RSS",f:"Robotics: Science and Systems",a:["Robotics"],r:27.4,y:"2025 · 163 / 594",p:31.9,py:"2024 · 135 / 423",v:1,u:"https://roboticsconference.org/",next:"RSS 2027 · Jul 6–11, 2027, Athens",dl:"2026-12-04",dlNote:"Stage 1 extended abstract; invited final papers due Apr 16, 2027"},
+ {n:"IROS",f:"IEEE/RSJ Intelligent Robots and Systems",a:["Robotics","Multi-robot"],r:36.5,y:"2026 · 1,585 / 4,348",p:46.2,py:"2025 · 1,991 / 4,306",v:1,u:"https://www.iros2027.org/",next:"IROS 2027 · Sep 26–Oct 1, 2027, Florence",dl:"2027-03-01",dlNote:"Paper deadline per IEEE RAS; confirm on the official site"},
+ {n:"ICRA",f:"IEEE International Conference on Robotics and Automation",a:["Robotics","Multi-robot"],r:38.0,y:"2026 · 1,882 / 4,947",p:38.7,py:"2025 · 1,606 / 4,153",v:1,u:"https://2027.ieee-icra.org/",next:"ICRA 2027 · May 24–28, 2027, Seoul",dl:"2026-12-31",dlNote:"Paper deadline passed Sep 16, 2026. This date is for transferring accepted journal papers"},
+ {n:"CoRL",f:"Conference on Robot Learning",a:["Learning","Robotics"],r:39.3,y:"2024 · 264 / 671",p:40.0,py:"2023 · 199 / 498",v:1,u:"https://www.corl.org/",next:"CoRL 2026 · Nov 9–12, 2026, Austin",dl:null,dlNote:"2027 deadline expected around late May 2027"},
+ {n:"ICAPS",f:"Automated Planning and Scheduling",a:["AI & planning"],lo:25,hi:35,v:0,u:"https://icaps27.icaps-conference.org/",next:"ICAPS 2027 · Jun 27–Jul 2, 2027, Columbia SC",dl:"2026-12-07",dlNote:"Abstract deadline; notification Feb 26, 2027"},
+ {n:"WAFR",f:"Workshop on the Algorithmic Foundations of Robotics",a:["Robotics"],lo:30,hi:40,v:0},
+ {n:"SoCS",f:"Symposium on Combinatorial Search",a:["AI & planning","Multi-robot"],lo:35,hi:50,v:0},
+ {n:"ISRR",f:"International Symposium on Robotics Research",a:["Robotics"],lo:35,hi:50,v:0},
+ {n:"DARS",f:"Distributed Autonomous Robotic Systems",a:["Multi-robot"],lo:40,hi:55,v:0},
+ {n:"MRS",f:"IEEE Symposium on Multi-Robot & Multi-Agent Systems",a:["Multi-robot"],lo:40,hi:55,v:0},
+ {n:"Humanoids",f:"IEEE-RAS International Conference on Humanoid Robots",a:["Robotics"],lo:40,hi:55,v:0},
+ {n:"L4DC",f:"Learning for Dynamics and Control",a:["Learning","Control"],lo:40,hi:55,v:0},
+ {n:"CASE",f:"IEEE Automation Science and Engineering",a:["Industry","Robotics"],lo:45,hi:60,v:0},
+ {n:"CDC",f:"IEEE Conference on Decision and Control",a:["Control"],lo:45,hi:60,v:0},
+ {n:"ECC",f:"European Control Conference",a:["Control"],lo:55,hi:70,v:0},
+ {n:"ACC",f:"American Control Conference",a:["Control","ASME"],lo:55,hi:70,v:0},
+ {n:"MECC",f:"ASME Modeling, Estimation and Control Conference",a:["Control","ASME"],lo:55,hi:70,v:0},
+ {n:"IDETC/CIE",f:"ASME Design Engineering Technical Conferences (incl. Mechanisms & Robotics)",a:["ASME","Robotics"],lo:55,hi:70,v:0},
+ {n:"MSEC",f:"ASME Manufacturing Science and Engineering Conference",a:["ASME","Industry"],lo:55,hi:70,v:0}
+];
+
+const JOUR=[
+ {n:"Science Robotics",a:["Robotics"],lo:5,hi:10},
+ {n:"IJRR",f:"International Journal of Robotics Research",a:["Robotics"],lo:10,hi:25},
+ {n:"T-RO",f:"IEEE Transactions on Robotics",a:["Robotics","Multi-robot"],lo:10,hi:25},
+ {n:"AIJ",f:"Artificial Intelligence",a:["AI & planning"],lo:10,hi:25},
+ {n:"JAIR",f:"Journal of Artificial Intelligence Research",a:["AI & planning"],lo:10,hi:25},
+ {n:"TAC",f:"IEEE Transactions on Automatic Control",a:["Control"],lo:10,hi:25},
+ {n:"Automatica",a:["Control"],lo:10,hi:25},
+ {n:"RA-L",f:"IEEE Robotics and Automation Letters (can be presented at ICRA/IROS)",a:["Robotics","Multi-robot"],lo:25,hi:40},
+ {n:"T-ASE",f:"IEEE Transactions on Automation Science and Engineering",a:["Industry","Robotics"],lo:25,hi:40},
+ {n:"JAAMAS",f:"Autonomous Agents and Multi-Agent Systems",a:["AI & planning","Multi-robot"],lo:25,hi:40},
+ {n:"TCNS",f:"IEEE Transactions on Control of Network Systems",a:["Control","Multi-robot"],lo:25,hi:40},
+ {n:"TCST",f:"IEEE Transactions on Control Systems Technology",a:["Control"],lo:25,hi:40},
+ {n:"Autonomous Robots",a:["Robotics","Multi-robot"],lo:25,hi:40},
+ {n:"TMLR",f:"Transactions on Machine Learning Research",a:["Learning"],lo:25,hi:40},
+ {n:"RAS",f:"Robotics and Autonomous Systems",a:["Robotics"],lo:30,hi:50},
+ {n:"JMR",f:"ASME Journal of Mechanisms and Robotics",a:["ASME","Robotics"],lo:30,hi:50},
+ {n:"JDSMC",f:"ASME Journal of Dynamic Systems, Measurement, and Control",a:["ASME","Control"],lo:30,hi:50},
+ {n:"JMSE",f:"ASME Journal of Manufacturing Science and Engineering",a:["ASME","Industry"],lo:30,hi:50},
+ {n:"Swarm Intelligence",a:["Multi-robot"],lo:30,hi:50},
+ {n:"IEEE T-II / T-IE",f:"Transactions on Industrial Informatics / Industrial Electronics",a:["Industry"],lo:30,hi:50},
+ {n:"Transportation Science / IISE Trans. / EJOR",f:"Operations-research outlets for task allocation",a:["Industry","AI & planning"],lo:30,hi:50},
+ {n:"JAVS",f:"ASME Journal of Autonomous Vehicles and Systems",a:["ASME","Multi-robot"],lo:40,hi:60},
+ {n:"JCISE",f:"ASME Journal of Computing and Information Science in Engineering",a:["ASME"],lo:40,hi:60},
+ {n:"ASME Letters in DSC",f:"ASME Letters in Dynamic Systems and Control",a:["ASME","Control"],lo:40,hi:60}
+];
+
+let view="conf", area="All";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mid=x=>x.v?x.r:(x.lo+x.hi)/2;
+const match=x=>area==="All"||x.a.includes(area);
+
+function trend(x){
+  if(est(x))return "";
+  if(x.p==null)return `<div class="trend">Previous year: not available</div>`;
+  const d=x.r-x.p, cls=d<0?"down":d>0?"up":"";
+  const word=d<0?"harder":d>0?"easier":"no change";
+  return `<div class="trend">Previous year: <b>${x.p.toFixed(1)}%</b> (${esc(x.py)}) <span class="${cls}">${d>0?"+":""}${d.toFixed(1)} pts, ${word}</span></div>`;
+}
+const est=x=>!x.v;
+function rows(list){
+  return list.filter(match).sort((p,q)=>mid(p)-mid(q)).map((x,i)=>{
+    const m=mid(x), est=!x.v;
+    const rate=est?`${x.lo}–${x.hi}%<small>estimate</small>`:`${x.r.toFixed(1)}%<small>${esc(x.y)}</small>`;
+    const title=x.u?`<a href="${x.u}" target="_blank" rel="noopener">${esc(x.n)}</a>`:esc(x.n);
+    return `<li class="row"><div class="rank">${i+1}</div><div>
+      <div class="top"><span class="name">${title}</span><span class="rate">${rate}</span></div>
+      ${x.f?`<div class="full">${esc(x.f)}</div>`:`<div class="full"></div>`}
+      <div class="bar" role="img" aria-label="${est?'Estimated':'Published'} acceptance about ${Math.round(m)} percent"><div class="fill${est?' est':''}" style="width:${m}%"></div>${x.p!=null?`<div class="prev" style="left:calc(${x.p}% - 1px)"></div>`:""}</div>
+      ${trend(x)}
+      <div class="meta">${x.a.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}${x.next?`<span>${esc(x.next)}</span>`:""}</div>
+    </div></li>`}).join("")||`<li class="row"><div></div><div class="note">No venues in this area. Pick another filter.</div></li>`;
+}
+
+function daysTo(d){
+  const t=new Date(d+"T23:59:00-12:00"), now=new Date();
+  return Math.ceil((t-now)/86400000);
+}
+function fmt(d){return new Date(d+"T12:00:00Z").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
+
+function deadlines(){
+  const list=CONF.filter(match).filter(x=>x.next);
+  const dated=list.filter(x=>x.dl).map(x=>({...x,d:daysTo(x.dl)})).sort((p,q)=>(p.d<0)-(q.d<0)||p.d-q.d);
+  const tba=list.filter(x=>!x.dl);
+  let h=dated.map(x=>{
+    const cls=x.d<0?"gone":x.d<=30?"soon":"";
+    const num=x.d<0?"—":x.d, lab=x.d<0?"passed":x.d===1?"day":"days";
+    return `<div class="dl ${cls}"><div class="days">${num}<span>${lab}</span></div><div>
+      <div class="name"><a href="${x.u}" target="_blank" rel="noopener">${esc(x.n)}</a></div>
+      <div class="full">${fmt(x.dl)} · ${esc(x.dlNote)}</div>
+      <div class="meta"><span>${esc(x.next)}</span></div></div></div>`}).join("");
+  if(tba.length){
+    h+=`<h2>Dates not announced yet</h2>`+tba.map(x=>`<div class="dl"><div class="days">TBA</div><div>
+      <div class="name"><a href="${x.u}" target="_blank" rel="noopener">${esc(x.n)}</a></div>
+      <div class="full">${esc(x.dlNote)}</div><div class="meta"><span>${esc(x.next)}</span></div></div></div>`).join("");
+  }
+  return h||`<p class="note">No tracked deadlines in this area. Pick another filter.</p>`;
+}
+
+function render(){
+  $("#chips").innerHTML=AREAS.map(a=>`<button class="chip" aria-pressed="${a===area}" data-a="${a}">${a}</button>`).join("");
+  $("#conf-list").innerHTML=rows(CONF);
+  $("#jour-list").innerHTML=rows(JOUR);
+  $("#dead-list").innerHTML=deadlines();
+  ["conf","jour","dead"].forEach(v=>$("#v-"+v).hidden=v!==view);
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.view===view));
+}
+document.addEventListener("click",e=>{
+  const t=e.target.closest(".tab"); if(t){view=t.dataset.view;render();return}
+  const c=e.target.closest(".chip"); if(c){area=c.dataset.a;render()}
+});
+render();
+
+/* hero: robots circulating a warehouse grid */
+(function(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const cv=$("#floor"),ctx=cv.getContext("2d");
+  let W,H,S=22,cols,rowsN,bots=[];
+  const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function size(){
+    const r=cv.getBoundingClientRect(),dpr=devicePixelRatio||1;
+    cv.width=r.width*dpr;cv.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+    W=r.width;H=r.height;cols=Math.floor(W/S);rowsN=Math.floor(H/S);
+    bots=[];const n=Math.max(6,Math.floor(cols*rowsN/40));
+    for(let i=0;i<n;i++){const x=Math.floor(Math.random()*cols),y=Math.floor(Math.random()*rowsN);
+      const yy=shelf(x,y)?(y+1)%rowsN:y;
+      bots.push({x,y:yy,px:x,py:yy,tx:x,ty:yy,t:1,c:i%3===0})}
+  }
+  const occ=(x,y,self)=>bots.some(b=>b!==self&&((b.tx===x&&b.ty===y)||(b.x===x&&b.y===y)));
+  const shelf=(x,y)=>y%3===1&&x%6!==0&&x%6!==5;
+  function step(){
+    for(const b of bots){
+      if(b.t<1)continue;
+      b.x=b.tx;b.y=b.ty;
+      const dirs=[[1,0],[-1,0],[0,1],[0,-1]].sort(()=>Math.random()-.5);
+      for(const[dx,dy]of dirs){const nx=b.x+dx,ny=b.y+dy;
+        if(nx<0||ny<0||nx>=cols||ny>=rowsN||shelf(nx,ny)||occ(nx,ny,b))continue;
+        b.px=b.x;b.py=b.y;b.tx=nx;b.ty=ny;b.t=0;break}
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle=css("--line");ctx.lineWidth=1;
+    for(let x=0;x<=cols;x++){ctx.beginPath();ctx.moveTo(x*S+.5,0);ctx.lineTo(x*S+.5,rowsN*S);ctx.stroke()}
+    for(let y=0;y<=rowsN;y++){ctx.beginPath();ctx.moveTo(0,y*S+.5);ctx.lineTo(cols*S,y*S+.5);ctx.stroke()}
+    ctx.fillStyle=css("--line");
+    for(let y=0;y<rowsN;y++)for(let x=0;x<cols;x++)if(shelf(x,y))ctx.fillRect(x*S+3,y*S+3,S-6,S-6);
+    for(const b of bots){
+      b.t=Math.min(1,b.t+.06);
+      const e=b.t<.5?2*b.t*b.t:1-Math.pow(-2*b.t+2,2)/2;
+      const x=(b.px+(b.tx-b.px)*e)*S+S/2,y=(b.py+(b.ty-b.py)*e)*S+S/2;
+      ctx.fillStyle=b.c?css("--safety"):css("--steel");
+      ctx.beginPath();ctx.arc(x,y,S*.32,0,Math.PI*2);ctx.fill();
+    }
+    step();requestAnimationFrame(draw);
+  }
+  size();addEventListener("resize",size);
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
