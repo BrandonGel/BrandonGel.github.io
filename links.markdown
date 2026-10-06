@@ -14,4 +14,4 @@ Resources I've put together or find myself coming back to.
   </a>
 </div>
 
-<script src="{{ '/assets/js/warehouse-floor.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/warehouse-floor.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
