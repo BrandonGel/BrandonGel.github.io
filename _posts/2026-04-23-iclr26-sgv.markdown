@@ -1,0 +1,18 @@
+---
+layout: post
+title:  "Let's Think in Two Steps: Mitigating Agreement Bias in MLLMs with Self-Grounded Verification"
+date:   2026-04-23
+categories: research
+venue: "ICLR 2026"
+description: >-
+  Self-Grounded Verification, a two-step method that reduces agreement bias when
+  multimodal language models are used as verifiers for agent trajectories.
+---
+
+*Moises Andrade, Joonhyuk Cha, Brandon Ho, Vriksha Srihari, Karmesh Yadav, Zsolt Kira*
+
+We study multimodal large language models used as verifiers of agent behavior across web navigation, computer use, and robotics. We find that MLLMs in this role show a strong tendency to over-validate the trajectories they are asked to judge, a failure mode we call agreement bias. To address it, we propose Self-Grounded Verification (SGV), a two-step procedure: the model first samples broad priors on the task independently of the candidate trajectory, then evaluates that trajectory conditioned on the priors it generated. Across OSWorld, robomimic, and VisualWebArena, SGV improves both failure detection and downstream task performance. We additionally release an expanded VisualWebArena dataset, along with our code, models, and data.
+
+[Read the paper][Link-to-Paper]
+
+[Link-to-Paper]: https://proceedings.iclr.cc/paper_files/paper/2026/hash/3e1fb72d876d634b2ac29e9ac2c937c9-Abstract-Conference.html
