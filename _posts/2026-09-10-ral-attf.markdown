@@ -1,0 +1,20 @@
+---
+layout: post
+title:  "Adaptive Task Token Framework for Multi-Agent Logistics Operations"
+date:   2026-09-10
+categories: research
+venue: "IEEE Robotics and Automation Letters"
+description: >-
+  ATTF, a Multi-Agent Pickup and Delivery framework that assigns tasks globally by
+  proximity and recovers from delays and deadlocks, scaling to 500 agents in real time.
+---
+
+*Kushal Shah, Alankrit Gupta, Brandon Ho, Jinhoo Kim, Hong-in Won, Seung-Kyum Choi*
+
+Multi-Agent Pickup and Delivery (MAPD) extends Multi-Agent Path Finding to long-horizon settings where pickup-and-delivery tasks arrive online and agents must be assigned and routed continuously, as in automated warehouses. Existing MAPD methods leave three gaps that limit real-world deployment. First, token-based methods such as Token Passing (TP) and TP with Task Swaps (TPTS) assign tasks sequentially, yielding greedy, globally suboptimal allocations and leaving idle agents parked where they obstruct active agents. Second, these methods assume disruption-free execution and provide no recovery from the delays and deadlocks common on real robots; k-TP adds delay tolerance but only conservatively and at high computational cost. Third, centralized optimal methods such as CENTRAL coordinate well but do not scale to real-time operation.
+
+To close these gaps, we propose the Adaptive Task Token Framework (ATTF), which (i) replaces sequential assignment with a global, proximity-based module that pairs all idle agents with all available tasks simultaneously by travel cost, and (ii) introduces a unified delay-and-deadlock-resilient mechanism that truncates and replans only affected paths and redirects idle agents to non-task endpoints to relieve congestion. Across diverse warehouse layouts, ATTF matches or improves on TP and TPTS in makespan and service time, and outperforms k-TP on all three metrics under delays — reducing service time by up to 49% and runtime by ~82% — while sustaining sub-second per-timestep runtime for up to 500 agents, a scale at which k-TP fails to produce solutions.
+
+[Read the paper][Link-to-Paper]
+
+[Link-to-Paper]: https://doi.org/10.1109/LRA.2026.3732893
