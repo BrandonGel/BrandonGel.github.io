@@ -22,6 +22,13 @@ Resources I've put together or find myself coming back to.
       <span class="link-card-desc">Conferences and journals for multi-robot systems, path and motion planning, task allocation and warehouse robotics, ranked by acceptance rate, with upcoming submission deadlines.</span>
     </span>
   </a>
+  <a class="link-card" href="{{ '/links/cetl-concept-map/' | relative_url }}">
+    <span class="link-card-media"><img src="{{ '/assets/images/cetl-concept-map.png' | relative_url }}" alt=""></span>
+    <span class="link-card-body">
+      <span class="link-card-title">CETL 8713 concept map</span>
+      <span class="link-card-desc">An interactive, zoomable map of the five core ideas from Teaching and Learning in Higher Education: prior knowledge and mastery, universal design, memory, prediction and retrieval, and connecting and practicing, with the links between them.</span>
+    </span>
+  </a>
 </div>
 
 <script src="{{ '/assets/js/warehouse-floor.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

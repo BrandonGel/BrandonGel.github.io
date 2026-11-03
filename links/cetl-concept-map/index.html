@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Interactive, zoomable concept map of the five core ideas from CETL 8713 (Teaching and Learning in Higher Education) and how they connect.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>CETL 8713 Concept Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+  /* Layout: one full-screen stage; a "world" layer carries the whole radial tree and is moved/scaled by the camera. */
+  :root {
+    box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); color-scheme: light;
+    --fk: 1; --bk: 1;
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #5d6066;
+    --line: #111111;
+    --panel: rgba(255,255,255,.86);
+    --panel-border: #d9d9d9;
+    --ghost-bg: rgba(255,255,255,.72);
+    --font-body: "Carlito", Calibri, "Segoe UI", Arial, sans-serif;
+    --font-ui: "Carlito", Calibri, "Segoe UI", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191d; --fg: #ececec; --muted: #a2a6ad; --line: #e8e8e8;
+      --panel: rgba(23,25,29,.86); --panel-border: #3a3d44; --ghost-bg: rgba(23,25,29,.72);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191d; --fg: #ececec; --muted: #a2a6ad; --line: #e8e8e8;
+    --panel: rgba(23,25,29,.86); --panel-border: #3a3d44; --ghost-bg: rgba(23,25,29,.72);
+    color-scheme: dark;
+  }
+
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: var(--font-body); overflow: hidden;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+    box-sizing: border-box;
+  }
+
+  #stage { position: relative; width: 100%; height: 100%; overflow: hidden; cursor: default; }
+  #world {
+    position: absolute; left: 0; top: 0; width: 0; height: 0;
+    transform-origin: 0 0;
+    transition: transform .9s cubic-bezier(.3,.7,.2,1);
+    will-change: transform;
+  }
+  #edges { position: absolute; left: -4000px; top: -4000px; width: 8000px; height: 8000px; overflow: visible; pointer-events: none; }
+  #edges line {
+    stroke: var(--line); stroke-width: 2.5; stroke-linecap: round;
+    opacity: 0; transition: opacity .5s ease;
+  }
+  #edges line.show { opacity: 1; }
+  #edges line.dashed { stroke-dasharray: 12 9; }
+  #edges line.ghostline { stroke-dasharray: 12 9; opacity: 0; }
+  #edges line.ghostline.show { opacity: .55; }
+
+  .node {
+    position: absolute; box-sizing: border-box;
+    transform: translate(-50%,-50%) scale(.6);
+    opacity: 0; pointer-events: none;
+    border: 2px solid var(--line); color: #111;
+    font-family: var(--font-body); line-height: 1.2; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .55s ease, transform .55s cubic-bezier(.3,.7,.2,1), box-shadow .2s ease;
+    user-select: none; -webkit-user-select: none;
+  }
+  .node.show { opacity: 1; transform: translate(-50%,-50%) scale(var(--nk, 1)); pointer-events: auto; }
+  /* Per-block resize handle, shown only in arrange mode. */
+  .node .rs { display: none; position: absolute; right: -10px; bottom: -10px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--line); cursor: nwse-resize; z-index: 4; box-sizing: border-box; }
+  .node .rs::before { content: ""; position: absolute; inset: 5px; border-right: 2px solid var(--line); border-bottom: 2px solid var(--line); }
+  .node.ellipse .rs { right: 6%; bottom: 4%; }
+  #stage.editing .node.show .rs { display: block; }
+  .node.ghost .rs { right: -9px; bottom: -9px; width: 20px; height: 20px; }
+  .node.clickable { cursor: pointer; }
+  .node.clickable:hover, .node.clickable:focus-visible { box-shadow: 0 0 0 4px rgba(0,0,0,.12), 0 8px 22px rgba(0,0,0,.18); outline: none; }
+  .node.light-text { color: #fff; }
+  .node.ellipse { border-radius: 50%; }
+  .node.rect { border-radius: 14px; }
+
+  /* --bk scales block dimensions, --fk scales type; both are set from the settings panel. */
+  .node.l0 { width: calc(540px * var(--bk)); height: calc(310px * var(--bk)); font-size: calc(42px * var(--fk)); font-weight: 700; padding: 0 calc(48px * var(--bk)); }
+  .node.l1 { width: calc(430px * var(--bk)); height: calc(250px * var(--bk)); font-size: calc(38px * var(--fk)); padding: 0 calc(36px * var(--bk)); }
+  .node.l2 { width: calc(260px * var(--bk)); min-height: calc(104px * var(--bk)); font-size: calc(21px * var(--fk)); padding: 14px 24px; }
+  .node.l2.ellipse { width: calc(250px * var(--bk)); height: calc(124px * var(--bk)); padding: 0 24px; }
+  .node.l3 { width: calc(310px * var(--bk)); min-height: calc(80px * var(--bk)); font-size: calc(18px * var(--fk)); padding: 14px 18px; line-height: 1.25; }
+  .node.ghost { font-size: calc(14px * var(--fk)); }
+  #stage.editing .node.show { cursor: grab; }
+  #stage.editing .node.dragging { cursor: grabbing; transition: none; z-index: 3; box-shadow: 0 0 0 4px rgba(0,0,0,.14), 0 18px 40px rgba(0,0,0,.28); }
+  .node.l3.list { text-align: left; flex-direction: column; align-items: flex-start; justify-content: center; }
+  .node ol { margin: 6px 0 0; padding-left: 24px; }
+  .node ol li { margin: 2px 0; }
+  .node .ttl { font-weight: 400; }
+  .node.list .ttl { display: block; }
+  /* Adaptive scaling: the idea in focus grows, its direct children grow a little, everything else stays at rest size. */
+  .node.show.kin { transform: translate(-50%,-50%) scale(calc(1.1 * var(--nk, 1))); }
+  /* Dim with an opaque veil (not opacity) so edges never show through a faded block. */
+  .node.show.dim::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; background: var(--bg); opacity: .7; transition: opacity .3s ease; pointer-events: none; }
+  .node.show.dim:hover::after { opacity: .25; }
+  .node.show.focused { transform: translate(-50%,-50%) scale(calc(1.3 * var(--nk, 1))); box-shadow: 0 0 0 4px rgba(0,0,0,.14), 0 14px 34px rgba(0,0,0,.22); z-index: 2; }
+  .node.show.focused.clickable:hover, .node.show.focused.clickable:focus-visible { box-shadow: 0 0 0 5px rgba(0,0,0,.18), 0 16px 38px rgba(0,0,0,.26); }
+
+  .node.ghost {
+    width: calc(210px * var(--bk)); min-height: calc(52px * var(--bk)); font-size: 14px; padding: 9px 12px;
+    border: 2px dashed var(--line); border-radius: 12px;
+    background: var(--ghost-bg); color: var(--fg); cursor: pointer;
+    backdrop-filter: blur(2px);
+  }
+  .node.ghost .tag { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .node.ghost .tag b { color: var(--fg); font-weight: 700; }
+  .node.ghost::before { content: ""; position: absolute; left: 6px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--ghost-color); }
+
+  /* UI chrome */
+  #crumbs {
+    position: absolute; left: 0; top: 0; z-index: 5;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    margin: 14px 0 0; padding: 8px 12px; background: var(--panel);
+    border: 1px solid var(--panel-border); border-radius: 12px;
+    font-family: var(--font-ui); font-size: 15px; max-width: calc(100% - 8px);
+  }
+  #crumbs button {
+    font: inherit; background: none; border: 0; padding: 4px 8px; border-radius: 8px;
+    color: var(--fg); cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  }
+  #crumbs button:hover, #crumbs button:focus-visible { background: rgba(127,127,127,.18); outline: none; }
+  #crumbs button[aria-current="page"] { font-weight: 700; cursor: default; }
+  #crumbs .sw { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; }
+  #crumbs .sep { color: var(--muted); }
+
+  #legend {
+    position: absolute; right: 0; bottom: 0; z-index: 5;
+    margin: 0 0 14px; padding: 10px 14px; background: var(--panel);
+    border: 1px solid var(--panel-border); border-radius: 12px;
+    font-family: var(--font-ui); font-size: 14px; color: var(--muted);
+    display: grid; grid-template-columns: 34px 1fr; gap: 6px 10px; align-items: center;
+  }
+  #legend svg { width: 34px; height: 10px; display: block; }
+  #legend line { stroke: var(--line); stroke-width: 2.5; stroke-linecap: round; }
+  #legend .hint { grid-column: 1 / -1; margin-top: 2px; }
+
+  #gear {
+    position: absolute; right: 0; top: 0; z-index: 6; margin: 14px 0 0;
+    width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--panel-border);
+    background: var(--panel); color: var(--fg); cursor: pointer; display: grid; place-items: center;
+  }
+  #gear:hover, #gear:focus-visible { background: rgba(127,127,127,.18); outline: none; }
+  #gear svg { width: 20px; height: 20px; }
+  #settings {
+    position: absolute; right: 0; top: 62px; z-index: 6; width: min(300px, calc(100% - 8px));
+    padding: 14px 16px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px;
+    font-family: var(--font-ui); font-size: 15px; display: grid; gap: 12px; backdrop-filter: blur(4px);
+  }
+  #settings h2 { margin: 0; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  #settings label { display: grid; gap: 4px; }
+  #settings .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  #settings output { font-variant-numeric: tabular-nums; color: var(--muted); }
+  #settings input[type="range"] { width: 100%; accent-color: #006fc0; }
+  #settings .toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  #settings .toggle input { width: 18px; height: 18px; accent-color: #006fc0; }
+  #settings .note { font-size: 13px; color: var(--muted); margin: 0; }
+  #settings .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  #settings button {
+    font: inherit; font-size: 14px; padding: 6px 10px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--panel-border); background: transparent; color: var(--fg);
+  }
+  #settings button:hover, #settings button:focus-visible { background: rgba(127,127,127,.18); outline: none; }
+
+  #hint {
+    position: absolute; left: 0; bottom: 0; z-index: 5; margin: 0 0 14px; padding: 8px 12px;
+    font-family: var(--font-ui); font-size: 14px; color: var(--muted);
+    background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px;
+    max-width: min(60%, 420px);
+  }
+
+  @media (max-width: 640px) {
+    #legend { display: none; }
+    #hint { max-width: calc(100% - 8px); font-size: 13px; }
+    #crumbs { font-size: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #world, .node, #edges line { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div id="stage" role="application" aria-label="Interactive concept map of CETL 8713">
+  <div id="world">
+    <svg id="edges" aria-hidden="true"></svg>
+    <div id="nodes"></div>
+  </div>
+  <nav id="crumbs" aria-label="Where you are in the map"></nav>
+  <button id="gear" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+  </button>
+  <section id="settings" hidden aria-label="Settings">
+    <h2>Display</h2>
+    <label>
+      <span class="row"><span>Font size</span><output id="font-out">100%</output></span>
+      <input id="font-k" type="range" min="0.8" max="2" step="0.05" value="1">
+    </label>
+    <label>
+      <span class="row"><span>Block size</span><output id="block-out">100%</output></span>
+      <input id="block-k" type="range" min="0.7" max="1.8" step="0.05" value="1">
+    </label>
+    <h2>Layout</h2>
+    <label class="toggle"><input id="edit-mode" type="checkbox"><span>Arrange blocks (drag to move, corner handle to resize)</span></label>
+    <p class="note">Sizes, positions and per-block scaling are remembered in this browser only.</p>
+    <div class="btns">
+      <button id="reset-layout" type="button">Reset layout</button>
+      <button id="reset-settings" type="button">Reset sizes</button>
+    </div>
+  </section>
+  <div id="hint">Click an idea, or scroll up near it, to zoom in a level; click an end idea to read it up close. Scroll down or click the background to step back out.</div>
+  <div id="legend" aria-label="Line legend">
+    <svg viewBox="0 0 34 10"><line x1="2" y1="5" x2="32" y2="5"/></svg><span>Directly connected</span>
+    <svg viewBox="0 0 34 10"><line x1="2" y1="5" x2="32" y2="5" stroke-dasharray="7 5"/></svg><span>Adjacent idea</span>
+    <span class="hint">Dashed chips lead to adjacent ideas in other branches.</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Content, copied from the concept map ---------- */
+  // level: 0 root, 1 core, 2 sub-idea, 3 end of tree
+  // angle: screen degrees (0 = right, 90 = down). off: angular offset from the parent's outward direction.
+  const N = [
+    { id: "root", level: 0, shape: "ellipse", color: "#f2f2f2", text: "CETL 8713: Teaching and Learning in Higher Education" },
+
+    // ---- Three Principles of Learning (red family) ----
+    { id: "tp", level: 1, parent: "root", angle: 185, shape: "ellipse", color: "#ff5050", text: "Three Principles of Learning" },
+    { id: "pk",  level: 2, parent: "tp", off: 55,  shape: "ellipse", color: "#ffcc66", text: "Prior Knowledge" },
+    { id: "org", level: 2, parent: "tp", off: 0,   shape: "ellipse", color: "#ff9933", text: "Organization" },
+    { id: "mas", level: 2, parent: "tp", off: -55, shape: "ellipse", color: "#ff7b80", text: "Mastery" },
+    { id: "pk1", level: 3, parent: "pk", off: 35,  shape: "rect", color: "#ffcc66", text: "Four Conditions of Prior Knowledge", list: ["Inaccurate Prior Knowledge", "Inappropriate Knowledge", "Insufficient Knowledge", "Activated + Relevant Knowledge"] },
+    { id: "pk2", level: 3, parent: "pk", off: -35, shape: "rect", color: "#ffcc66", text: "Prior Knowledge can hinder or enhance learning" },
+    { id: "org1", level: 3, parent: "org", off: 35,  shape: "rect", color: "#ff9933", text: "Organization reflects of one understanding" },
+    { id: "org2", level: 3, parent: "org", off: -35, shape: "rect", color: "#ff9933", text: "Knowledge Organization", list: ["Show the Structure", "Make Connections Visible", "Let Students Organize"] },
+    { id: "mas1", level: 3, parent: "mas", off: 35,  shape: "rect", color: "#ff7b80", text: "Mastery is One Recognition and Capability of a Skill" },
+    { id: "mas2", level: 3, parent: "mas", off: -35, shape: "rect", color: "#ff7b80", text: "Developing Mastery", list: ["Acquire Component Skills", "Integrate Skills Fluently", "Apply When/Where to Use Skills"] },
+
+    // ---- Universal Design of Learning (yellow family) ----
+    { id: "udl", level: 1, parent: "root", angle: 250, shape: "ellipse", color: "#ffff00", text: "Universal Design of Learning" },
+    { id: "one", level: 2, parent: "udl", off: 0, shape: "rect", color: "#ffff99", text: "One Size Does Not Fit All<br>Be Flexible and Listen" },
+    { id: "aware", level: 3, parent: "one", off: -40, shape: "rect", color: "#ffff99", text: "Be Knowledge &amp; Aware of People from Various Background" },
+    { id: "support", level: 3, parent: "one", off: 40, shape: "rect", color: "#ffff99", text: "Support Self-Knowledge &amp; Self-Advocacy" },
+
+    // ---- Memory & Learning (green family) ----
+    { id: "ml", level: 1, parent: "root", angle: 330, shape: "ellipse", color: "#00af50", light: true, text: "Memory &amp; Learning" },
+    { id: "li", level: 2, parent: "ml", off: -50, shape: "rect", color: "#ccff66", text: "Learning Involves the Ability to Do Something New from Experience" },
+    { id: "mb", level: 2, parent: "ml", off: 30,  shape: "rect", color: "#66ff33", text: "Memory are Born from our Thoughts" },
+    { id: "cog", level: 3, parent: "li", off: -35, shape: "rect", color: "#ccff66", text: "Cognitive Loads", lines: ["Intrinsic: Thought Provoking", "Extraneous: Mental Distraction", "Germane: Manual to Automation"] },
+    { id: "imp", level: 3, parent: "li", off: 35,  shape: "rect", color: "#ccff66", text: "Improve Learning", lines: ["Elaboration: Add Details", "Repetition: Activate Memory Again", "Interleaving: Use Prior Knowledge for Connection"] },
+    { id: "trans", level: 3, parent: "mb", off: -50, shape: "rect", color: "#66ff33", text: "Transitioning Short-Term To Long-Term Memory", list: ["Encoding", "Consolidation", "Storage", "Retrieval"] },
+    { id: "alt", level: 3, parent: "mb", off: 0,    shape: "rect", color: "#66ff33", text: "Every Memory Retrieval Altered Memory But Not the Meaning" },
+    { id: "dep", level: 3, parent: "mb", off: 50,   shape: "rect", color: "#66ff33", text: "Every Memory Depicts the Same Event Uniquely" },
+
+    // ---- Predictive & Retrieving (blue family) ----
+    { id: "pr", level: 1, parent: "root", angle: 20, shape: "ellipse", color: "#006fc0", light: true, text: "Predictive &amp; Retrieving" },
+    { id: "pred", level: 2, parent: "pr", off: -45, shape: "rect", color: "#66ffcc", text: "Predict on What We Are Going to Learn" },
+    { id: "ret",  level: 2, parent: "pr", off: 50,  shape: "rect", color: "#3399ff", text: "Retrieve What You Remember" },
+    { id: "micro", level: 3, parent: "pred", off: -35, shape: "rect", color: "#66ffcc", text: "Microlearning, like Quizzing, Provides Immediate Feedback" },
+    { id: "shift", level: 3, parent: "pred", off: 35,  shape: "rect", color: "#66ffcc", text: "Shift Metacognitions Leads to Better Sense of What We Know &amp; We Don’t Know" },
+    { id: "put",  level: 3, parent: "ret", off: -50, shape: "rect", color: "#3399ff", text: "Putting the Most Active Thought Leads to Better Understanding" },
+    { id: "mind", level: 3, parent: "ret", off: 0,   shape: "rect", color: "#3399ff", text: "Mindful Learning is Active Engagement for Improvement rather than Autopilot" },
+    { id: "des",  level: 3, parent: "ret", off: 50,  shape: "rect", color: "#3399ff", text: "Desirable Difficulty Leaves an Imprint" },
+
+    // ---- Connecting & Practicing (purple family) ----
+    { id: "cp", level: 1, parent: "root", angle: 115, shape: "ellipse", color: "#9f2b92", light: true, text: "Connecting &amp; Practicing" },
+    { id: "conn", level: 2, parent: "cp", off: 40,  shape: "rect", color: "#ff99cc", text: "Connection is the change of how our mind understands." },
+    { id: "prac", level: 2, parent: "cp", off: -45, shape: "rect", color: "#9999ff", text: "Practicing provides frequent opportunities for skill mastery" },
+    { id: "ana", level: 3, parent: "conn", off: -50, shape: "rect", color: "#ff99cc", text: "Analogies serves as the bridges to form connections" },
+    { id: "stu", level: 3, parent: "conn", off: 0,   shape: "rect", color: "#ff99cc", text: "Students must form connection themselves to be meaningful" },
+    { id: "bld", level: 3, parent: "conn", off: 50,  shape: "rect", color: "#ff99cc", text: "Building Connection", list: ["Provide the Framework", "Facilitate Connections", "Leverage Peer Review"] },
+    { id: "enc", level: 3, parent: "prac", off: 35,  shape: "rect", color: "#9999ff", text: "Encouraging Practicing", list: ["Break Assessment into Various Cognitive Tasks", "Make Time for Opportunities for Practicing", "Provide Feedback on Practice Effort"] },
+    { id: "cont", level: 3, parent: "prac", off: -35, shape: "rect", color: "#9999ff", text: "Continuous Creation in Materials Leads to Practices not Feeling Repetitive" },
+  ];
+
+  // Solid edges between siblings (in addition to every parent→child edge).
+  const SOLID_EXTRA = [
+    ["support", "aware"], ["alt", "dep"], ["shift", "micro"],
+    ["des", "mind"], ["mind", "put"], ["ana", "stu"],
+  ];
+  // Dashed edges = adjacent ideas.
+  const DASHED = [
+    ["li", "cont"], ["alt", "put"], ["stu", "mind"], ["pk", "imp"], ["ml", "put"],
+    ["pk1", "conn"], ["cont", "des"], ["shift", "put"], ["dep", "micro"],
+  ];
+
+  /* ---------- Layout (radial) ---------- */
+  const R1 = 720, R2 = 560, R3 = 420;          // ring radii: root→core, core→sub, sub→leaf
+  const SPREAD = { 2: 1.1, 3: 1.15 };           // widen the fans so larger blocks never touch
+  const byId = Object.fromEntries(N.map(n => [n.id, n]));
+  const rad = d => d * Math.PI / 180;
+  N.forEach(n => { n.children = []; });
+  N.forEach(n => { if (n.parent) byId[n.parent].children.push(n); });
+
+  function computeLayout() {
+    byId.root.x = 0; byId.root.y = 0;
+    N.filter(n => n.level === 1).forEach(c => {
+      c.dir = c.angle;
+      c.x = Math.cos(rad(c.dir)) * R1; c.y = Math.sin(rad(c.dir)) * R1;
+      c.core = c.id;
+      c.children.forEach(s => {
+        s.dir = c.dir + s.off * SPREAD[2]; s.core = c.id;
+        s.x = c.x + Math.cos(rad(s.dir)) * R2; s.y = c.y + Math.sin(rad(s.dir)) * R2;
+        s.children.forEach(l => {
+          l.dir = s.dir + l.off * SPREAD[3]; l.core = c.id;
+          l.x = s.x + Math.cos(rad(l.dir)) * R3; l.y = s.y + Math.sin(rad(l.dir)) * R3;
+        });
+      });
+    });
+  }
+  computeLayout();
+
+  /* ---------- Settings (per-browser; stored locally when the browser allows it) ---------- */
+  const LS_SETTINGS = "cetl-map-settings", LS_LAYOUT = "cetl-map-layout";
+  const settings = { fontK: 1, blockK: 1, edit: false };
+  const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} };
+  Object.assign(settings, lsGet(LS_SETTINGS) || {});
+  settings.edit = false; // arranging is a session choice, never remembered
+  const savedLayout = lsGet(LS_LAYOUT);
+  N.forEach(n => { n.k = 1; });
+  if (savedLayout) N.forEach(n => { const p = savedLayout[n.id]; if (p && p.length >= 2) { n.x = p[0]; n.y = p[1]; if (p[2]) n.k = p[2]; } });
+  let ghostOv = (savedLayout && savedLayout.ghosts && typeof savedLayout.ghosts === "object") ? savedLayout.ghosts : {}; // "from->to": {dx, dy, k}
+  function applyScales() {
+    document.documentElement.style.setProperty("--fk", settings.fontK);
+    document.documentElement.style.setProperty("--bk", settings.blockK);
+  }
+  applyScales();
+
+  const EST_BASE = { 0: [540, 310], 1: [430, 250], 2: [260, 130], 3: [310, 160] };
+  const EST = new Proxy({}, { get: (_, lvl) => EST_BASE[lvl].map(v => v * settings.blockK) });
+
+  /* ---------- Render ---------- */
+  const stage = document.getElementById("stage");
+  const world = document.getElementById("world");
+  const svg = document.getElementById("edges");
+  const nodesEl = document.getElementById("nodes");
+  const crumbs = document.getElementById("crumbs");
+  const SVG_OFF = 4000;
+  const esc = s => s;
+
+  function nodeHTML(n) {
+    let h = `<span class="ttl">${n.text}</span>`;
+    if (n.list) h += `<ol>${n.list.map(i => `<li>${i}</li>`).join("")}</ol>`;
+    if (n.lines) h += n.lines.map(i => `<span style="display:block">${i}</span>`).join("");
+    return h;
+  }
+  N.forEach(n => {
+    const el = document.createElement("div");
+    el.className = `node l${n.level} ${n.shape}${n.list || n.lines ? " list" : ""}${n.light ? " light-text" : ""} clickable`;
+    el.style.left = n.x + "px"; el.style.top = n.y + "px";
+    el.style.background = n.color;
+    el.dataset.id = n.id;
+    el.innerHTML = nodeHTML(n) + '<span class="rs" title="Drag to resize this block" aria-hidden="true"></span>';
+    el.style.setProperty("--nk", n.k);
+    el.tabIndex = 0; el.setAttribute("role", "button");
+    el.querySelector(".rs").addEventListener("pointerdown", ev => startResize(ev, n));
+    el.addEventListener("click", ev => { ev.stopPropagation(); if (n._dragged) { n._dragged = false; return; } onNode(n); });
+    el.addEventListener("pointerdown", ev => startDrag(ev, n));
+    el.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onNode(n); } });
+    nodesEl.appendChild(el); n.el = el;
+  });
+
+  const edges = [];
+  function mkLine(a, b, cls) {
+    const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    l.setAttribute("x1", a.x + SVG_OFF); l.setAttribute("y1", a.y + SVG_OFF);
+    l.setAttribute("x2", b.x + SVG_OFF); l.setAttribute("y2", b.y + SVG_OFF);
+    l.setAttribute("class", cls); svg.appendChild(l);
+    return { a, b, el: l, dashed: cls === "dashed" };
+  }
+  N.forEach(n => { if (n.parent) edges.push(mkLine(byId[n.parent], n, "solid")); });
+  SOLID_EXTRA.forEach(([a, b]) => edges.push(mkLine(byId[a], byId[b], "solid")));
+  DASHED.forEach(([a, b]) => edges.push(mkLine(byId[a], byId[b], "dashed")));
+
+  /* ---------- State ---------- */
+  const state = { core: null, sub: null, leaf: null };
+  const cam = { tx: 0, ty: 0, s: 1 };
+  let ghosts = [];
+
+  function visibleIds() {
+    const v = new Set(["root"]);
+    N.filter(n => n.level === 1).forEach(c => v.add(c.id));
+    if (state.core) {
+      byId[state.core].children.forEach(s => v.add(s.id));
+      if (state.sub) byId[state.sub].children.forEach(l => v.add(l.id));
+    }
+    return v;
+  }
+
+  function clearGhosts() {
+    ghosts.forEach(g => { g.el.remove(); g.line.remove(); });
+    ghosts = [];
+  }
+
+  function makeGhosts(vis) {
+    clearGhosts();
+    if (!state.core) return;
+    const seen = new Set();
+    DASHED.forEach(([a, b]) => {
+      [[a, b], [b, a]].forEach(([from, to]) => {
+        const F = byId[from], T = byId[to];
+        if (!vis.has(from) || vis.has(to)) return;
+        if (F.core !== state.core) return;
+        const key = from + "->" + to; if (seen.has(key)) return; seen.add(key);
+        // Place the chip in the widest open angle around F: away from its parent, its visible children and other chips.
+        const blocked = [];
+        if (F.parent) { const P = byId[F.parent]; blocked.push(Math.atan2(P.y - F.y, P.x - F.x) * 180 / Math.PI); }
+        F.children.forEach(c => { if (vis.has(c.id)) blocked.push(c.dir); });
+        ghosts.filter(g => g.from === F).forEach(g => blocked.push(g.ang));
+        const angDist = (a, b) => { let d = Math.abs(((a - b) % 360 + 540) % 360 - 180); return d; };
+        let best = F.dir || 0, bestScore = -1;
+        for (let a = 0; a < 360; a += 10) {
+          const score = Math.min(...blocked.map(b => angDist(a, b)), 999) - angDist(a, F.dir || 0) * 0.15;
+          if (score > bestScore) { bestScore = score; best = a; }
+        }
+        const d = F.level === 1 ? 340 : 290;
+        const g = { x: F.x + Math.cos(rad(best)) * d, y: F.y + Math.sin(rad(best)) * d, target: T, from: F, ang: best, key, k: 1 };
+        const ov = ghostOv[key];
+        if (ov) { g.x = F.x + ov.dx; g.y = F.y + ov.dy; g.k = ov.k || 1; g.ang = Math.atan2(ov.dy, ov.dx) * 180 / Math.PI; }
+        g.dx = g.x - F.x; g.dy = g.y - F.y;
+        const el = document.createElement("div");
+        el.className = "node ghost";
+        el.style.left = g.x + "px"; el.style.top = g.y + "px";
+        el.style.setProperty("--ghost-color", T.color);
+        el.style.setProperty("--nk", g.k);
+        el.tabIndex = 0; el.setAttribute("role", "button");
+        el.innerHTML = `<span><span class="tag">Adjacent · <b>${byId[T.core].text}</b></span>${T.text}</span><span class="rs" title="Drag to resize this chip" aria-hidden="true"></span>`;
+        el.addEventListener("click", ev => { ev.stopPropagation(); if (g._dragged) { g._dragged = false; return; } goTo(T); });
+        el.addEventListener("pointerdown", ev => startDragGhost(ev, g));
+        el.querySelector(".rs").addEventListener("pointerdown", ev => startResizeGhost(ev, g));
+        el.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); goTo(T); } });
+        nodesEl.appendChild(el);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", F.x + SVG_OFF); line.setAttribute("y1", F.y + SVG_OFF);
+        line.setAttribute("x2", g.x + SVG_OFF); line.setAttribute("y2", g.y + SVG_OFF);
+        line.setAttribute("class", "ghostline"); svg.appendChild(line);
+        g.el = el; g.line = line; ghosts.push(g);
+        requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add("show"); line.classList.add("show"); }));
+      });
+    });
+  }
+
+  function fitCamera(vis) {
+    // Fit the focused idea and its children; let the parent peek into frame.
+    const focusId = state.leaf || state.sub || state.core;
+    const ids = focusId
+      ? [focusId, ...byId[focusId].children.map(c => c.id)]
+      : [...vis];
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const grow = (x, y, w, h) => { x0 = Math.min(x0, x - w / 2); y0 = Math.min(y0, y - h / 2); x1 = Math.max(x1, x + w / 2); y1 = Math.max(y1, y + h / 2); };
+    ids.forEach(id => {
+      const n = byId[id]; let [w, h] = EST[n.level];
+      const k = (n.id === focusId ? 1.3 : (focusId && n.parent === focusId ? 1.1 : 1)) * (n.k || 1);
+      grow(n.x, n.y, w * k, h * k);
+    });
+    if (focusId) {
+      // A point roughly a third of the way into the parent, so part of it stays on screen.
+      const F = byId[focusId], P = byId[F.parent];
+      const [pw] = EST[P.level];
+      const dx = F.x - P.x, dy = F.y - P.y, len = Math.hypot(dx, dy) || 1;
+      grow(P.x + dx / len * pw * 0.2, P.y + dy / len * pw * 0.2, 20, 20);
+    }
+    ghosts.filter(g => g.from.id === focusId || g.from.parent === focusId).forEach(g => grow(g.x, g.y, 210 * g.k * settings.blockK, 80 * g.k * settings.blockK));
+    const pad = focusId ? 70 : 24;
+    const vw = stage.clientWidth, vh = stage.clientHeight;
+    const bw = (x1 - x0) + pad * 2, bh = (y1 - y0) + pad * 2 + (focusId ? 70 : 40); // room for the top bar
+    const s = Math.min(vw / bw, vh / bh, state.leaf ? 2.4 : 1.25);
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const tx = vw / 2 - cx * s, ty = vh / 2 - cy * s + 30 * s;
+    cam.tx = tx; cam.ty = ty; cam.s = s;
+    world.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+  }
+
+  function renderCrumbs() {
+    const parts = [{ n: byId.root, go: () => setState(null, null) }];
+    if (state.core) parts.push({ n: byId[state.core], go: () => setState(state.core, null) });
+    if (state.sub) parts.push({ n: byId[state.sub], go: () => setState(state.core, state.sub) });
+    if (state.leaf) parts.push({ n: byId[state.leaf], go: () => {} });
+    crumbs.innerHTML = "";
+    parts.forEach((p, i) => {
+      if (i) { const s = document.createElement("span"); s.className = "sep"; s.textContent = "›"; crumbs.appendChild(s); }
+      const b = document.createElement("button");
+      b.innerHTML = `<span class="sw" style="background:${p.n.color}"></span><span>${i === 0 ? "CETL 8713" : p.n.text.replace(/<br>/g, " ")}</span>`;
+      if (i === parts.length - 1) b.setAttribute("aria-current", "page"); else b.addEventListener("click", p.go);
+      crumbs.appendChild(b);
+    });
+  }
+
+  function setState(core, sub, leaf) {
+    state.core = core; state.sub = sub; state.leaf = leaf || null;
+    const vis = visibleIds();
+    N.forEach(n => {
+      n.el.classList.toggle("show", vis.has(n.id));
+      const focusId = state.leaf || sub || core;
+      n.el.classList.toggle("focused", n.id === focusId);
+      n.el.classList.toggle("kin", !!focusId && n.parent === focusId);
+      n.el.classList.toggle("dim", !!focusId && n.id !== focusId && n.parent !== focusId && n.id !== byId[focusId].parent);
+    });
+    edges.forEach(e => e.el.classList.toggle("show", vis.has(e.a.id) && vis.has(e.b.id)));
+    makeGhosts(vis);
+    fitCamera(vis);
+    renderCrumbs();
+  }
+
+  function onNode(n) {
+    if (n.level === 0) return setState(null, null);
+    if (n.level === 1) return state.core === n.id && !state.sub ? setState(null, null) : setState(n.id, null);
+    if (n.level === 2) return state.sub === n.id && !state.leaf ? setState(n.core, null) : setState(n.core, n.id);
+    if (n.level === 3) return state.leaf === n.id ? setState(n.core, n.parent) : setState(n.core, n.parent, n.id);
+  }
+  function goTo(t) {
+    if (t.level === 1) setState(t.id, null);
+    else if (t.level === 2) setState(t.core, t.id);
+    else setState(t.core, t.parent, t.id);
+  }
+  function stepOut() {
+    if (state.leaf) setState(state.core, state.sub);
+    else if (state.sub) setState(state.core, null);
+    else if (state.core) setState(null, null);
+  }
+
+  stage.addEventListener("click", stepOut);
+
+  /* ---------- Arrange mode: drag blocks to new positions ---------- */
+  function moveNode(n, x, y) {
+    n.x = x; n.y = y;
+    n.el.style.left = x + "px"; n.el.style.top = y + "px";
+    edges.forEach(e => {
+      if (e.a === n) { e.el.setAttribute("x1", x + SVG_OFF); e.el.setAttribute("y1", y + SVG_OFF); }
+      if (e.b === n) { e.el.setAttribute("x2", x + SVG_OFF); e.el.setAttribute("y2", y + SVG_OFF); }
+    });
+    ghosts.forEach(g => {
+      if (g.from !== n) return;
+      g.line.setAttribute("x1", x + SVG_OFF); g.line.setAttribute("y1", y + SVG_OFF);
+      moveGhost(g, x + g.dx, y + g.dy); // chips ride along with their block
+    });
+  }
+  function moveGhost(g, x, y) {
+    g.x = x; g.y = y; g.dx = x - g.from.x; g.dy = y - g.from.y;
+    g.el.style.left = x + "px"; g.el.style.top = y + "px";
+    g.line.setAttribute("x2", x + SVG_OFF); g.line.setAttribute("y2", y + SVG_OFF);
+  }
+  // Generic drag: `obj` has x, y, el; `apply(x, y)` repositions it; `done()` runs after a real move.
+  function dragAny(ev, obj, apply, done) {
+    if (!settings.edit || ev.button !== 0) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const sx = ev.clientX, sy = ev.clientY, ox = obj.x, oy = obj.y;
+    let moved = false;
+    obj.el.setPointerCapture(ev.pointerId);
+    obj.el.classList.add("dragging");
+    const onMove = e => {
+      const dx = (e.clientX - sx) / cam.s, dy = (e.clientY - sy) / cam.s;
+      if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 4) moved = true;
+      if (moved) apply(ox + dx, oy + dy);
+    };
+    const onUp = () => {
+      obj.el.removeEventListener("pointermove", onMove); obj.el.removeEventListener("pointerup", onUp); obj.el.removeEventListener("pointercancel", onUp);
+      obj.el.classList.remove("dragging");
+      if (moved) { obj._dragged = true; done(); }
+    };
+    obj.el.addEventListener("pointermove", onMove); obj.el.addEventListener("pointerup", onUp); obj.el.addEventListener("pointercancel", onUp);
+  }
+  // Generic resize from a corner handle: scales `obj.k` by the pointer's distance from the block centre.
+  function resizeAny(ev, obj, done) {
+    if (!settings.edit || ev.button !== 0) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const h = ev.currentTarget;
+    const r = stage.getBoundingClientRect();
+    const toWorld = e => [(e.clientX - r.left - cam.tx) / cam.s, (e.clientY - r.top - cam.ty) / cam.s];
+    const [wx0, wy0] = toWorld(ev);
+    const d0 = Math.max(20, Math.hypot(wx0 - obj.x, wy0 - obj.y)), k0 = obj.k;
+    h.setPointerCapture(ev.pointerId);
+    obj.el.classList.add("dragging");
+    const onMove = e => {
+      const [wx, wy] = toWorld(e);
+      obj.k = Math.min(3, Math.max(0.5, k0 * Math.hypot(wx - obj.x, wy - obj.y) / d0));
+      obj.el.style.setProperty("--nk", obj.k);
+    };
+    const onUp = () => {
+      h.removeEventListener("pointermove", onMove); h.removeEventListener("pointerup", onUp); h.removeEventListener("pointercancel", onUp);
+      obj.el.classList.remove("dragging");
+      obj._dragged = true; // swallow the click that follows
+      done();
+    };
+    h.addEventListener("pointermove", onMove); h.addEventListener("pointerup", onUp); h.addEventListener("pointercancel", onUp);
+  }
+  function startDrag(ev, n) { dragAny(ev, n, (x, y) => moveNode(n, x, y), saveLayout); }
+  function startResize(ev, n) { resizeAny(ev, n, saveLayout); }
+  function startDragGhost(ev, g) {
+    dragAny(ev, g, (x, y) => moveGhost(g, x, y), () => { ghostOv[g.key] = { dx: Math.round(g.dx), dy: Math.round(g.dy), k: g.k }; saveLayout(); });
+  }
+  function startResizeGhost(ev, g) {
+    resizeAny(ev, g, () => { ghostOv[g.key] = { dx: Math.round(g.dx), dy: Math.round(g.dy), k: +g.k.toFixed(3) }; saveLayout(); });
+  }
+  function saveLayout() {
+    const out = { ghosts: ghostOv };
+    N.forEach(m => { out[m.id] = [Math.round(m.x), Math.round(m.y), +m.k.toFixed(3)]; });
+    lsSet(LS_LAYOUT, out);
+  }
+  function resetLayout() {
+    computeLayout();
+    ghostOv = {};
+    N.forEach(n => { n.k = 1; n.el.style.setProperty("--nk", 1); moveNode(n, n.x, n.y); });
+    lsDel(LS_LAYOUT);
+    setState(state.core, state.sub, state.leaf);
+  }
+
+  /* ---------- Settings panel ---------- */
+  const panel = document.getElementById("settings");
+  const gear = document.getElementById("gear");
+  const fontR = document.getElementById("font-k"), blockR = document.getElementById("block-k"), editT = document.getElementById("edit-mode");
+  const fontOut = document.getElementById("font-out"), blockOut = document.getElementById("block-out");
+  const hintEl = document.getElementById("hint");
+  const HINT_NAV = hintEl.textContent;
+  function syncPanel() {
+    fontR.value = settings.fontK; blockR.value = settings.blockK; editT.checked = settings.edit;
+    fontOut.textContent = Math.round(settings.fontK * 100) + "%"; blockOut.textContent = Math.round(settings.blockK * 100) + "%";
+    stage.classList.toggle("editing", settings.edit);
+    hintEl.textContent = settings.edit ? "Arrange mode: drag any block or adjacent-idea chip to move it; drag its corner handle to resize it. Kept in this browser. Click still navigates." : HINT_NAV;
+  }
+  function saveSettings() { lsSet(LS_SETTINGS, { fontK: settings.fontK, blockK: settings.blockK }); }
+  gear.addEventListener("click", ev => { ev.stopPropagation(); panel.hidden = !panel.hidden; gear.setAttribute("aria-expanded", String(!panel.hidden)); });
+  panel.addEventListener("click", ev => ev.stopPropagation());
+  panel.addEventListener("wheel", ev => ev.stopPropagation(), { passive: true });
+  fontR.addEventListener("input", () => { settings.fontK = +fontR.value; applyScales(); syncPanel(); saveSettings(); });
+  blockR.addEventListener("input", () => { settings.blockK = +blockR.value; applyScales(); syncPanel(); saveSettings(); fitCamera(visibleIds()); });
+  editT.addEventListener("change", () => { settings.edit = editT.checked; syncPanel(); });
+  document.getElementById("reset-layout").addEventListener("click", resetLayout);
+  document.getElementById("reset-settings").addEventListener("click", () => {
+    settings.fontK = 1; settings.blockK = 1; applyScales(); syncPanel(); saveSettings(); fitCamera(visibleIds());
+  });
+  syncPanel();
+
+  /* ---------- Scroll wheel: up = zoom into the nearest next-level idea, down = step out ---------- */
+  let wheelAcc = 0, wheelLock = 0;
+  function nearestNextLevel(clientX, clientY) {
+    const r = stage.getBoundingClientRect();
+    const wx = (clientX - r.left - cam.tx) / cam.s, wy = (clientY - r.top - cam.ty) / cam.s;
+    let cands;
+    if (!state.core) cands = N.filter(n => n.level === 1);
+    else if (!state.sub) cands = byId[state.core].children;
+    else cands = [
+      ...byId[state.sub].children.filter(l => l.id !== state.leaf),
+      ...byId[state.core].children.filter(s => s.id !== state.sub),
+    ];
+    let best = null, bd = Infinity;
+    cands.forEach(c => { const d = Math.hypot(c.x - wx, c.y - wy); if (d < bd) { bd = d; best = c; } });
+    return best;
+  }
+  stage.addEventListener("wheel", ev => {
+    ev.preventDefault();
+    const now = performance.now();
+    if (now < wheelLock) return;
+    wheelAcc += ev.deltaMode === 1 ? ev.deltaY * 16 : ev.deltaY;
+    if (Math.abs(wheelAcc) < 50) return;
+    const zoomIn = wheelAcc < 0; wheelAcc = 0; wheelLock = now + 750;
+    if (!zoomIn) { stepOut(); return; }
+    const t = nearestNextLevel(ev.clientX, ev.clientY);
+    if (!t) return;
+    if (t.level === 1) setState(t.id, null);
+    else if (t.level === 2) setState(t.core, t.id);
+    else setState(t.core, t.parent, t.id);
+  }, { passive: false });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") stepOut(); });
+  window.addEventListener("resize", () => fitCamera(visibleIds()));
+
+  world.style.transition = "none";
+  setState(null, null);
+  requestAnimationFrame(() => requestAnimationFrame(() => { world.style.transition = ""; }));
+})();
+</script>
+
+</body>
+</html>
