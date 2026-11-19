@@ -19,7 +19,7 @@ Resources I've put together or find myself coming back to.
     <span class="link-card-media"><canvas class="warehouse-floor" aria-hidden="true"></canvas></span>
     <span class="link-card-body">
       <span class="link-card-title">Publishing venues</span>
-      <span class="link-card-desc">Conferences and journals for multi-robot systems, path and motion planning, task allocation and warehouse robotics, ranked by acceptance rate, with upcoming submission deadlines.</span>
+      <span class="link-card-desc">Conferences and journals across robotics, from planning, learning and multi-robot systems to perception, HRI, medical, soft and field robotics, ranked by acceptance rate, with past editions, accepted papers and upcoming deadlines.</span>
     </span>
   </a>
   <a class="link-card" href="{{ '/links/cetl-concept-map/' | relative_url }}">
